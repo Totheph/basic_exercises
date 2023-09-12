@@ -1,9 +1,6 @@
 # Задание 1
 # Дан список учеников, нужно посчитать количество повторений каждого имени ученика
-# Пример вывода:
-# Вася: 1
-# Маша: 2
-# Петя: 2
+
 
 students = [
     {'first_name': 'Вася'},
@@ -12,13 +9,17 @@ students = [
     {'first_name': 'Маша'},
     {'first_name': 'Петя'},
 ]
-# ???
-
+names = []
+for dictt in students:
+    names.append(dictt["first_name"])
+print(names)
+for name in names:
+    print(f"{name}: {names.count(name)}")
+    names.remove(name)
 
 # Задание 2
-# Дан список учеников, нужно вывести самое часто повторящееся имя
-# Пример вывода:
-# Самое частое имя среди учеников: Маша
+
+#Через люмбду, мне кажется, тут удобнее всего:
 students = [
     {'first_name': 'Вася'},
     {'first_name': 'Петя'},
@@ -26,14 +27,12 @@ students = [
     {'first_name': 'Маша'},
     {'first_name': 'Оля'},
 ]
-# ???
-
+names = [dictt["first_name"] for dictt in students]
+print("Самое частое имя среди учеников:", max(names, key= lambda x: names.count(x)))
 
 # Задание 3
 # Есть список учеников в нескольких классах, нужно вывести самое частое имя в каждом классе.
-# Пример вывода:
-# Самое частое имя в классе 1: Вася
-# Самое частое имя в классе 2: Маша
+
 
 school_students = [
     [  # это – первый класс
@@ -51,8 +50,10 @@ school_students = [
         {'first_name': 'Саша'},
     ],
 ]
-# ???
 
+for students in school_students:
+    names = [dictt["first_name"] for dictt in students]
+    print(f"Самое частое имя в классе {school_students.index(students)+1}:", max(names, key= lambda x: names.count(x)))
 
 # Задание 4
 # Для каждого класса нужно вывести количество девочек и мальчиков в нём.
@@ -63,8 +64,9 @@ school_students = [
 school = [
     {'class': '2a', 'students': [{'first_name': 'Маша'}, {'first_name': 'Оля'}]},
     {'class': '2б', 'students': [{'first_name': 'Олег'}, {'first_name': 'Миша'}]},
-    {'class': '2б', 'students': [{'first_name': 'Даша'}, {'first_name': 'Олег'}, {'first_name': 'Маша'}]},
+    {'class': '2в', 'students': [{'first_name': 'Даша'}, {'first_name': 'Олег'}, {'first_name': 'Маша'}]}
 ]
+
 is_male = {
     'Олег': True,
     'Маша': False,
@@ -72,14 +74,32 @@ is_male = {
     'Миша': True,
     'Даша': False,
 }
-# ???
+
+def gender_count(name_list):
+    girls_count = 0
+    boys_count = 0
+    for name in name_list:
+        if is_male[name]:
+            boys_count += 1
+        else:
+            girls_count += 1
+    return [girls_count, boys_count]
+
+for school_class in school:
+    names = [pair["first_name"] for pair in school_class["students"]]
+    girls, boys = gender_count(names)
+    print(f"Класс {school_class['class']}: девочки {girls}, мальчики {boys}")
+
 
 
 # Задание 5
 # По информации о учениках разных классов нужно найти класс, в котором больше всего девочек и больше всего мальчиков
-# Пример вывода:
-# Больше всего мальчиков в классе 3c
-# Больше всего девочек в классе 2a
+
+
+
+#Мне кажется, что я тут намудрила....
+
+#И простите за люмбды)
 
 school = [
     {'class': '2a', 'students': [{'first_name': 'Маша'}, {'first_name': 'Оля'}]},
@@ -91,5 +111,22 @@ is_male = {
     'Олег': True,
     'Миша': True,
 }
-# ???
 
+def gender_count(name_list):
+    girls_count = 0
+    boys_count = 0
+    for name in name_list:
+        if is_male[name]:
+            boys_count += 1
+        else:
+            girls_count += 1
+    return [girls_count, boys_count]
+
+
+for school_class in school:
+    names = [pair["first_name"] for pair in school_class["students"]]
+    school_class["genders"] = gender_count(names)
+
+
+print("Больше всего мальчиков в классе", max(school, key=lambda sch_class: sch_class["genders"][1])["class"])
+print("Больше всего девочек в классе", max(school, key=lambda sch_class: sch_class["genders"][0])["class"])
