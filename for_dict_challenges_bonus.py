@@ -1,35 +1,7 @@
-"""
-Пожалуйста, приступайте к этой задаче после того, как вы сделали и получили ревью ко всем остальным задачам
-в этом репозитории. Она значительно сложнее.
+#вроде сделала 4 первые пункта (как же это было тяжело :((( ))))
+#пятый пункт в процессе, сдам его потом
 
 
-Есть набор сообщений из чата в следующем формате:
-
-```
-messages = [
-    {
-        "id": "efadb781-9b04-4aad-9afe-e79faef8cffb",
-        "sent_at": datetime.datetime(2022, 10, 11, 23, 11, 11, 721),
-        "sent_by": 46,  # id пользователя-отправителя
-        "reply_for": "7b22ae19-6c58-443e-b138-e22784878581",  # id сообщение, на которое это сообщение является ответом (может быть None)
-        "seen_by": [26, 91, 71], # идентификаторы пользователей, которые видели это сообщение
-        "text": "А когда ревью будет?",
-    }
-]
-```
-
-Так же есть функция `generate_chat_history`, которая вернёт список из большого количества таких сообщений.
-Установите библиотеку lorem, чтобы она работала.
-
-Нужно:
-1. Вывести айди пользователя, который написал больше всех сообщений.
-2. Вывести айди пользователя, на сообщения которого больше всего отвечали.
-3. Вывести айди пользователей, сообщения которых видело больше всего уникальных пользователей.
-4. Определить, когда в чате больше всего сообщений: утром (до 12 часов), днём (12-18 часов) или вечером (после 18 часов).
-5. Вывести идентификаторы сообщений, который стали началом для самых длинных тредов (цепочек ответов).
-
-Весь код стоит разбить на логические части с помощью функций.
-"""
 import random
 import uuid
 import datetime
@@ -59,12 +31,60 @@ def generate_chat_history():
                     ),
                 ],
             ),
-            "seen_by": random.sample(users_ids,
-                                     random.randint(1, len(users_ids))),
+            "seen_by": random.sample(users_ids, random.randint(1, len(users_ids))),
             "text": lorem.sentence(),
         })
     return messages
 
 
+def more_messages(users_list):
+    ids = [user["sent_by"] for user in users_list]
+    return max(set(ids), key=ids.count)
+
+def more_answers(users_list):
+    ids_list = {}
+    all_reply = [message["reply_for"] for message in users_list]
+    for message in users_list:
+        for reply in all_reply:
+            if reply == message["id"]:
+                ids_list[message["sent_by"]]= ids_list.get(message['sent_by'], 0) + 1
+    return max(ids_list, key=ids_list.get)
+
+def more_views(messages_list):
+    views_list = {}
+    for message in messages_list:
+        total_views = views_list.get(message["sent_by"], [])
+        total_views.extend(message["seen_by"])
+        views_list[message["sent_by"]] = total_views
+    for key, value in views_list.items():
+        value = list(set(value))
+        views_list[key] = value
+    m = max(views_list.values(), key = len)
+    users_max_views = []
+    for key, value in views_list.items():
+        if value == m:
+            users_max_views.append(key)
+    return users_max_views
+
+def more_time(messages_list):
+    time_dict = {}
+    for message in messages_list:
+        if datetime.time(0, 0, 0) < message["sent_at"].time() < datetime.time(12, 0, 0):
+            time_dict["утро"] = time_dict.get("утро", 0) + 1
+        elif datetime.time(12, 0, 0) <= message["sent_at"].time() <= datetime.time(18, 0, 0):
+            time_dict["день"] = time_dict.get("день", 0) + 1
+        else:
+            time_dict["вечер"] = time_dict.get("вечер", 0) + 1
+    return max(time_dict, key=time_dict.get)
+
+
+def main():
+    messages = generate_chat_history()
+    print(f"ID пользователя, отправившего больше всего сообщений: {more_messages(messages)}")
+    print(f"ID пользователя, на сообщения которого отвечали больше всего: {more_answers(messages)}")
+    print("Больше просмотров у пользователей:", *more_views(messages))
+    print(f"Больше всего сообщений было отправлено в {more_time(messages)}")
+    
+
 if __name__ == "__main__":
-    print(generate_chat_history())
+    main()
