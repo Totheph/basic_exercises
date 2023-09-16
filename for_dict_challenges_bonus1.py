@@ -1,5 +1,3 @@
-#вроде сделала 4 первые пункта (как же это было тяжело :((( ))))
-#пятый пункт в процессе, сдам его потом
 
 
 import random
@@ -50,7 +48,7 @@ def more_answers(users_list):
                 ids_list[message["sent_by"]]= ids_list.get(message['sent_by'], 0) + 1
     return max(ids_list, key=ids_list.get)
 
-def most_seen_users(messages_list):
+def more_views(messages_list):
     views_list = {}
     for message in messages_list:
         total_views = views_list.get(message["sent_by"], [])
@@ -77,6 +75,22 @@ def more_time(messages_list):
             time_dict["вечер"] = time_dict.get("вечер", 0) + 1
     return max(time_dict, key=time_dict.get)
 
+def longest(messages):
+  replies_dict = {message["id"] : [] for message in messages if message["reply_for"] != None}
+  for message in messages:
+    reply_for = message["reply_for"]
+    if reply_for != None:
+        answer_for = replies_dict.get(reply_for, [])
+        answer_for.append(message["id"])
+        replies_dict[reply_for] = answer_for
+  len_dict = {key : len(replies_dict[key]) for key in replies_dict.keys()}
+  for key_id in replies_dict.keys():
+    nesting_list = [key for key, values_list in replies_dict.items() if key_id in values_list]
+    for nest in nesting_list:
+        len_sublist = len(replies_dict[key_id])
+        len_dict[nest] += len_sublist
+  return max(len_dict, key=len_dict.get)
+  
 
 def main():
     messages = generate_chat_history()
@@ -84,6 +98,7 @@ def main():
     print(f"ID пользователя, на сообщения которого отвечали больше всего: {more_answers(messages)}")
     print("Больше просмотров у пользователей:", *more_views(messages))
     print(f"Больше всего сообщений было отправлено в {more_time(messages)}")
+    print(f"Самая длинная цепочка у сообщения {longest(messages)}")
     
 
 if __name__ == "__main__":
