@@ -50,7 +50,7 @@ def more_answers(users_list):
                 ids_list[message["sent_by"]]= ids_list.get(message['sent_by'], 0) + 1
     return max(ids_list, key=ids_list.get)
 
-def more_views(messages_list):
+def most_seen_users(messages_list):
     views_list = {}
     for message in messages_list:
         total_views = views_list.get(message["sent_by"], [])
